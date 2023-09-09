@@ -22,7 +22,7 @@ jobs:
           node-version: ${{ matrix.node-version }}
 
       - name: Install Dependencies
-        uses: npm install
+        run: npm install
       
       - name: Deploy
         uses: mohammed-atif/firebase-publish-react@v1.0
