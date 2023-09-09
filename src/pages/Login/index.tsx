@@ -3,17 +3,24 @@ import { UserContext } from "@/contexts/UserContext";
 import { auth, googleProvider } from "@/providers/firebase";
 import { signInWithPopup } from "firebase/auth";
 import { useContext } from "react";
+import { useNavigate } from "react-router-dom";
 import { twMerge } from "tailwind-merge";
 
 export default function LoginPage() {
-  const { validateGoogleUser } = useContext(UserContext);
+  const { setUser, validateGoogleUser } = useContext(UserContext);
+  const navigate = useNavigate();
 
   const handleGoogleLogin = async () => {
     try {
-      const { user } = await signInWithPopup(auth, googleProvider);
-      validateGoogleUser(user);
+      const { user: gUser } = await signInWithPopup(auth, googleProvider);
+      const dbUser = await validateGoogleUser(gUser);
+
+      setUser(dbUser);
+      navigate("/");
     } catch (error) {
-      console.log(error);
+      // TO DO handle error
+      setUser(null);
+      console.error(error);
     }
   };
 

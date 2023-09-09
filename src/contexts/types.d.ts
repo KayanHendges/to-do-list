@@ -1,7 +1,8 @@
 import { User as GoogleUser } from "firebase/auth";
+import { Dispatch, SetStateAction } from "react";
 
 interface IUserContext {
   user: IUser | null;
-  googleUser: GoogleUser | null
-  validateGoogleUser: (user: GoogleUser | null ) => Promise<void>
+  setUser: Dispatch<SetStateAction<IUser | null>>;
+  validateGoogleUser: (user: GoogleUser) => Promise<IUser>;
 }
