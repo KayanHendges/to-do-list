@@ -1,0 +1,13 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  body {
+    margin: 0;
+    display: flex;
+    place-items: center;
+    width: 100vw;
+    height: 100vh;
+  }
+}
