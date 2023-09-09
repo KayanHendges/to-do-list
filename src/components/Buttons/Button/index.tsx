@@ -17,7 +17,7 @@ export default function Button({
     <button
       data-loading={isLoading || undefined}
       data-primary={primary}
-      className={twMerge("btn data-[primary]:btn-primary data-[primary]:text-white", className)}
+      className={twMerge("btn text-white data-[primary]:btn-primary data-[primary]:text-white", className)}
       {...props}
     >
       {isLoading ? <span className="loading loading-spinner" /> : children}

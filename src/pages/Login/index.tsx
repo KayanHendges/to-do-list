@@ -1,5 +1,6 @@
 import Button from "@/components/Buttons/Button";
-import { UserContext } from "@/contexts/UserContext";
+import { Heading } from "@/components/Typography/Heading";
+import { UserContext } from "@/contexts/User/UserContext";
 import { auth, googleProvider } from "@/providers/firebase";
 import { signInWithPopup } from "firebase/auth";
 import { useContext } from "react";
@@ -37,7 +38,7 @@ export default function LoginPage() {
           "bg-zinc-50 p-4 rounded-lg prose"
         )}
       >
-        <h2>Seja bem-vindo!</h2>
+        <Heading>Seja bem-vindo!</Heading>
         <Button primary onClick={handleGoogleLogin}>
           Entre com o Google
         </Button>

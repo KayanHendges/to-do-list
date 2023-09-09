@@ -1,14 +1,24 @@
 import { db } from "@/providers/firebase";
+import { FirestoreEntity } from "@/providers/firestore/types";
 import {
-  DocumentData,
   addDoc,
   doc,
   getDoc,
   setDoc,
   collection,
+  onSnapshot,
+  FirestoreError,
+  query,
+  QueryConstraint,
 } from "firebase/firestore";
 
-export class FireStoreProvider<Entity extends DocumentData & { id: string }> {
+interface StreamListProps<Entity> {
+  callback: (list: Entity[]) => void;
+  onError?: (err: FirestoreError) => void;
+  fsQuery?: QueryConstraint[];
+}
+
+export class FireStoreProvider<Entity extends FirestoreEntity> {
   constructor(private documentCollection: string) {}
 
   find = async (docId: string) => {
@@ -21,7 +31,7 @@ export class FireStoreProvider<Entity extends DocumentData & { id: string }> {
         `Doc ${docId} not found on ${this.documentCollection} collection.`
       );
 
-    return data as Entity;
+    return { ...data, id: docId } as Entity;
   };
 
   create = async (
@@ -38,5 +48,22 @@ export class FireStoreProvider<Entity extends DocumentData & { id: string }> {
     const created = await addDoc(docRef, payload);
 
     return { ...payload, id: created.id } as Entity;
+  };
+
+  streamList = ({ callback, onError, fsQuery }: StreamListProps<Entity>) => {
+    const collectionRef = collection(db, this.documentCollection);
+    const docRef = fsQuery ? query(collectionRef, ...fsQuery) : collectionRef;
+
+    return onSnapshot(
+      docRef,
+      (doc) => {
+        const results: Entity[] = [];
+        doc.forEach((it) =>
+          results.push({ ...it.data(), id: it.id } as Entity)
+        );
+        callback(results);
+      },
+      onError
+    );
   };
 }
