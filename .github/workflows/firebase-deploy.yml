@@ -34,7 +34,7 @@ jobs:
         
   deploy:
     name: Deploy
-    environment: main
+    environment: prod
     needs: build
     runs-on: ubuntu-latest
     steps:
