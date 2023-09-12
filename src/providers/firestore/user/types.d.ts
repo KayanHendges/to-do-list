@@ -5,4 +5,5 @@ interface IUser {
   isOnline: boolean;
   lastOnlineStatus: number;
   photoURL: string | null;
+  createdAt: number;
 }

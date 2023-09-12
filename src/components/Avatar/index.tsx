@@ -5,8 +5,8 @@ const avatar = tv({
   base: "rounded-full border-zinc-800 overflow-hidden",
   variants: {
     size: {
-      sm: "w-12 h-12  border-2",
-      md: "w-16 h-16 border-2",
+      sm: "w-8 h-8  border",
+      md: "w-12 h-12 border-2",
       lg: "w-20 h-20 border-4",
     },
     isOnline: { true: "border-green-500" },
@@ -17,8 +17,10 @@ const avatar = tv({
   },
 });
 
-interface Props extends ComponentProps<"div">, VariantProps<typeof avatar> {
-  photoURL?: string;
+export interface AvatarProps
+  extends ComponentProps<"div">,
+    VariantProps<typeof avatar> {
+  photoURL?: string | null;
 }
 
 export default function Avatar({
@@ -27,10 +29,10 @@ export default function Avatar({
   isOnline,
   className,
   ...props
-}: Props) {
+}: AvatarProps) {
   return (
     <div className={avatar({ size, isOnline, className })} {...props}>
-      <img  className="w-full h-full" src={photoURL || "avatar.jpg"} />
+      <img className="w-full h-full" src={photoURL || "avatar.jpg"} />
     </div>
   );
 }

@@ -11,13 +11,20 @@ export default function Button({
   children,
   primary,
   isLoading,
+  type = "button",
+  disabled,
   ...props
 }: Props) {
   return (
     <button
       data-loading={isLoading || undefined}
       data-primary={primary}
-      className={twMerge("btn text-white data-[primary]:btn-primary data-[primary]:text-white", className)}
+      disabled={isLoading || disabled}
+      className={twMerge(
+        "btn text-white hover:bg-zinc-800 data-[primary]:btn-primary data-[primary]:text-white",
+        className
+      )}
+      type={type}
       {...props}
     >
       {isLoading ? <span className="loading loading-spinner" /> : children}

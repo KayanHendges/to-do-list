@@ -1,5 +1,11 @@
 import { db } from "@/providers/firebase";
-import { FirestoreEntity } from "@/providers/firestore/types";
+import {
+  CreatePayload,
+  FirestoreEntity,
+  StreamDocProps,
+  StreamListProps,
+  UpdatePayload,
+} from "@/providers/firestore/types";
 import {
   addDoc,
   doc,
@@ -7,35 +13,31 @@ import {
   setDoc,
   collection,
   onSnapshot,
-  FirestoreError,
   query,
-  QueryConstraint,
+  updateDoc,
+  deleteDoc,
 } from "firebase/firestore";
-
-interface StreamListProps<Entity> {
-  callback: (list: Entity[]) => void;
-  onError?: (err: FirestoreError) => void;
-  fsQuery?: QueryConstraint[];
-}
 
 export class FireStoreProvider<Entity extends FirestoreEntity> {
   constructor(private documentCollection: string) {}
+
+  private docNotFoundError = (docId: string) =>
+    new Error(
+      `Doc ${docId} not found on ${this.documentCollection} collection.`
+    );
 
   find = async (docId: string) => {
     const docRef = doc(db, this.documentCollection, docId);
     const response = await getDoc(docRef);
     const data = response.data();
 
-    if (!data)
-      throw new Error(
-        `Doc ${docId} not found on ${this.documentCollection} collection.`
-      );
+    if (!data) throw this.docNotFoundError(docId);
 
     return { ...data, id: docId } as Entity;
   };
 
   create = async (
-    payload: Omit<Entity, "id">,
+    payload: CreatePayload<Entity>,
     docId?: string
   ): Promise<Entity> => {
     if (docId) {
@@ -48,6 +50,28 @@ export class FireStoreProvider<Entity extends FirestoreEntity> {
     const created = await addDoc(docRef, payload);
 
     return { ...payload, id: created.id } as Entity;
+  };
+
+  update = async (payload: UpdatePayload<Entity>, docId: string) => {
+    const docRef = doc(db, this.documentCollection, docId);
+    await updateDoc(docRef, payload);
+  };
+
+  streamDoc = ({ callback, onError, docId }: StreamDocProps<Entity>) => {
+    const docRef = doc(db, this.documentCollection, docId);
+
+    return onSnapshot(
+      docRef,
+      (doc) => {
+        if (!doc.exists) {
+          onError && onError(this.docNotFoundError(docId));
+          return;
+        }
+
+        return callback({ ...doc.data(), id: docId } as Entity);
+      },
+      onError
+    );
   };
 
   streamList = ({ callback, onError, fsQuery }: StreamListProps<Entity>) => {
@@ -65,5 +89,10 @@ export class FireStoreProvider<Entity extends FirestoreEntity> {
       },
       onError
     );
+  };
+
+  delete = async (docId: string) => {
+    const docRef = doc(db, this.documentCollection, docId);
+    await deleteDoc(docRef);
   };
 }

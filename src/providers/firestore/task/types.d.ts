@@ -7,4 +7,6 @@ interface ITask {
   assigneeId: string | null;
   locked: boolean;
   status: TaskStatus;
+  createdBy: string;
+  createdAt: number;
 }

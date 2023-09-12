@@ -1,15 +1,19 @@
 import Button from "@/components/Buttons/Button";
 import TaskList from "@/components/Tasks/List";
+import TaskModal from "@/components/Tasks/Modal";
 import { Heading } from "@/components/Typography/Heading";
+import { UserContext } from "@/contexts/User/UserContext";
 import { taskProvider } from "@/providers/firestore/task";
-import { useState } from "react";
+import { useContext, useState } from "react";
 import { twMerge } from "tailwind-merge";
 
 export default function HomePage() {
   const [isCreating, setIsCreating] = useState<boolean>(false);
+  const [taskToUpdate, setTaskToUpdate] = useState<ITask | null>(null);
+  const { user } = useContext(UserContext);
 
   const createTask = async () => {
-    if (isCreating) return;
+    if (isCreating || !user) return;
     setIsCreating(true);
 
     try {
@@ -19,6 +23,8 @@ export default function HomePage() {
         assigneeId: null,
         locked: false,
         status: "open",
+        createdBy: user?.id,
+        createdAt: new Date().getTime(),
       });
     } catch (error) {
       // TODO handle error
@@ -30,12 +36,15 @@ export default function HomePage() {
 
   return (
     <div className="w-full h-full flex flex-col gap-4 px-8 pt-4">
+      {taskToUpdate && (
+        <TaskModal task={taskToUpdate} onClose={() => setTaskToUpdate(null)} />
+      )}
       <div className="w-full items-center flex gap-2">
         <Heading size="xl" className="mr-auto ml-4">
           Tarefas
         </Heading>
         <Button>Filtros</Button>
-        <Button primary onClick={createTask} isLoading={isCreating}>
+        <Button primary onClick={() => createTask()} isLoading={isCreating}>
           Criar
         </Button>
       </div>
@@ -45,9 +54,9 @@ export default function HomePage() {
           "p-8 pb-0 bg-white rounded-lg"
         )}
       >
-        <TaskList status="open" />
-        <TaskList status="inProgress" />
-        <TaskList status="done" />
+        <TaskList onTaskClick={setTaskToUpdate} status="open" />
+        <TaskList onTaskClick={setTaskToUpdate} status="inProgress" />
+        <TaskList onTaskClick={setTaskToUpdate} status="done" />
       </div>
     </div>
   );

@@ -33,6 +33,7 @@ export default function UserProvider({ children }: { children: ReactNode }) {
         photoURL,
         isOnline: true,
         lastOnlineStatus: new Date().getTime(),
+        createdAt: new Date().getTime(),
       },
       uid
     );
@@ -66,7 +67,7 @@ export default function UserProvider({ children }: { children: ReactNode }) {
   }, [user]);
 
   return (
-    <UserContext.Provider value={{ user, setUser, validateGoogleUser }}>
+    <UserContext.Provider value={{ user, setUser, users, validateGoogleUser }}>
       {children}
     </UserContext.Provider>
   );

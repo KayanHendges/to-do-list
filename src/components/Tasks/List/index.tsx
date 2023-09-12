@@ -7,6 +7,7 @@ import { twMerge } from "tailwind-merge";
 
 interface Props extends ComponentProps<"div"> {
   status: TaskStatus;
+  onTaskClick: (task: ITask) => void;
 }
 
 interface TaskConfig {
@@ -20,14 +21,25 @@ const taskMapper: Record<TaskStatus, TaskConfig> = {
   done: { title: "Concluídas", className: "bg-green-500" },
 };
 
-export default function TaskList({ status, className, ...props }: Props) {
+export default function TaskList({
+  status,
+  className,
+  onTaskClick,
+  ...props
+}: Props) {
   const { list: tasks } = useCollection<ITask>("tasks", {
     query: [where("status", "==", status)],
   });
   const taskConfg = taskMapper[status];
 
   return (
-    <div className={twMerge("flex-1 max-w-full h-full flex flex-col gap-2", className)} {...props}>
+    <div
+      className={twMerge(
+        "flex-1 max-w-full h-full flex flex-col gap-2",
+        className
+      )}
+      {...props}
+    >
       <div
         className={twMerge(
           "w-full flex justify-center px-4 py-2 truncate rounded",
@@ -44,7 +56,11 @@ export default function TaskList({ status, className, ...props }: Props) {
         )}
       >
         {tasks.map((task) => (
-          <TaskCard key={task.id} task={task} />
+          <TaskCard
+            key={task.id}
+            task={task}
+            onClick={() => onTaskClick(task)}
+          />
         ))}
       </div>
     </div>

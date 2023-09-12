@@ -1,11 +1,13 @@
-import Avatar from "@/components/Avatar";
+import { Profile } from "@/components/Profile";
 import { Heading } from "@/components/Typography/Heading";
-import { Text } from "@/components/Typography/Text";
-import useCollection from "@/hooks/firestore/useCollection";
+import { UserContext } from "@/contexts/User/UserContext";
+import { useContext } from "react";
 import { twMerge } from "tailwind-merge";
 
 export default function Sidebar() {
-  const { list: users } = useCollection<IUser>("users");
+  const { users, user } = useContext(UserContext);
+
+  const list = users.filter((it) => it.id !== user?.id);
 
   return (
     <div
@@ -18,22 +20,14 @@ export default function Sidebar() {
         Usuários
       </Heading>
       <div className="w-full flex-1 max-h-full flex flex-col gap-2 overflow-y-auto">
-        {users.map(({ id, name, email, photoURL }) => (
-          <div
-            key={id}
-            className={twMerge(
-              "flex items-center gap-4 px-4 py-2",
-              "hover:bg-zinc-100 cursor-pointer"
-            )}
-          >
-            <Avatar size="sm" photoURL={photoURL || undefined} />
-            <div className="flex-1 flex flex-col justify-start truncate">
-              <Text truncate>{name}</Text>
-              <Text truncate size="sm">
-                {email}
-              </Text>
-            </div>
-          </div>
+        {list.map(({ id }) => (
+          <Profile.Root key={id} userId={id}>
+            <Profile.Avatar size="md" />
+            <Profile.Content>
+              <Profile.Name shortName />
+              <Profile.Email />
+            </Profile.Content>
+          </Profile.Root>
         ))}
       </div>
     </div>
