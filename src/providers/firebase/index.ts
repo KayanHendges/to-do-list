@@ -23,6 +23,8 @@ const firebaseConfig = {
   measurementId: VITE_FB_MEASUREMENT_ID,
 };
 
+console.log({ firebaseConfig });
+
 export const app = initializeApp(firebaseConfig);
 
 export const auth = getAuth();

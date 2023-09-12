@@ -1,5 +1,5 @@
 {
   "projects": {
-    "default": "to-do-list-7245e"
+    "default": "{{project-name}}"
   }
 }
