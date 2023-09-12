@@ -1,6 +1,5 @@
 import { Profile } from "@/components/Profile";
 import { Heading } from "@/components/Typography/Heading";
-import { Text } from "@/components/Typography/Text";
 import { UserContext } from "@/contexts/User/UserContext";
 import { useContext } from "react";
 
