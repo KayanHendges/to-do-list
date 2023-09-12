@@ -19,6 +19,7 @@ env:
 jobs:
   build:
     runs-on: ubuntu-latest
+    environment: prod
 
     strategy:
       matrix:
@@ -32,10 +33,6 @@ jobs:
           node-version: ${{ matrix.node-version }}
 
       - run: npm install -g yarn
-
-      - name: Update Firebase Config File
-        run: |
-          sed -i s/{{project-name}}/${{ env.VITE_FB_PROJECT_ID }}/g ./.firebaserc
 
       - name: yarn install, build and test
         run: |
@@ -51,15 +48,22 @@ jobs:
   deploy:
     name: Deploy
     environment: prod
+    
     needs: build
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v2
+
       - name: Download Build
         uses: actions/download-artifact@v2
         with:
           name: build
           path: dist
+
+      - name: Update Firebase Config File
+        run: |
+          sed -i s/{{project-name}}/${{ env.VITE_FB_PROJECT_ID }}/g ./.firebaserc
+
       - name: Depoy to Firebase
         uses: w9jds/firebase-action@master
         with:
