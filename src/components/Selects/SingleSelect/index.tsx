@@ -146,7 +146,7 @@ function SingleSelectMenu({
       data-placement-top={placement === "top" || undefined}
       data-placement-bottom={placement === "bottom" || undefined}
       className={twMerge(
-        "w-full max-w-sm absolute overflow-y-auto z-20",
+        "w-full max-h-96 absolute overflow-y-auto z-20",
         "bg-zinc-50 border-2 border-primary rounded-lg",
         "data-[placement-top]:bottom-full data-[placement-bottom]:top-full",
         className

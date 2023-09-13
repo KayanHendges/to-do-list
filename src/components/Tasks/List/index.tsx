@@ -36,7 +36,7 @@ export default function TaskList({
 
   return (
     <div
-      className={twMerge("flex-1 flex flex-col gap-2", className)}
+      className={twMerge("flex-1 flex h-full flex-col", className)}
       {...props}
     >
       <div
@@ -49,16 +49,18 @@ export default function TaskList({
       </div>
       <div
         className={twMerge(
-          "flex-1 max-w-full w-full flex flex-col gap-2 overflow-y-auto"
+          "w-full flex-1 relative flex overflow-y-auto"
         )}
       >
-        {list.map((task) => (
-          <TaskCard
-            key={task.id}
-            task={task}
-            onClick={() => onTaskClick(task)}
-          />
-        ))}
+        <div className="flex absolute flex-col gap-4 py-4">
+          {list.map((task) => (
+            <TaskCard
+              key={task.id}
+              task={task}
+              onClick={() => onTaskClick(task)}
+            />
+          ))}
+        </div>
       </div>
     </div>
   );
