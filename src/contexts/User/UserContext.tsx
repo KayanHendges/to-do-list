@@ -24,14 +24,19 @@ export default function UserProvider({ children }: { children: ReactNode }) {
       users.find((it) => it.id === uid) ||
       (await fbUserProvider.find(gUser.uid).catch(() => null));
 
-    if (dbUser) return dbUser;
+    if (dbUser) {
+      await fbUserProvider.update(
+        { lastOnlineStatus: new Date().getTime() },
+        dbUser.id
+      );
+      return dbUser;
+    }
 
     const created = await fbUserProvider.create(
       {
         name: displayName,
         email,
         photoURL,
-        isOnline: true,
         lastOnlineStatus: new Date().getTime(),
         createdAt: new Date().getTime(),
       },
@@ -64,6 +69,20 @@ export default function UserProvider({ children }: { children: ReactNode }) {
     if (!user) return;
 
     fbUserProvider.handlePresence(user.id);
+  }, [user]);
+
+  useEffect(() => {
+    if (!user) return;
+    const interval = setInterval(
+      async () => {
+        await fbUserProvider.update(
+          { lastOnlineStatus: new Date().getTime() },
+          user.id
+        );
+      },
+      1000 * 60 // 1 minute
+    );
+    return () => clearInterval(interval);
   }, [user]);
 
   return (

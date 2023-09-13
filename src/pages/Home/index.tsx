@@ -17,7 +17,7 @@ export default function HomePage() {
     setIsCreating(true);
 
     try {
-      await taskProvider.create({
+      const created = await taskProvider.create({
         title: "Nova tarefa",
         description: null,
         assigneeId: null,
@@ -26,6 +26,7 @@ export default function HomePage() {
         createdBy: user?.id,
         createdAt: new Date().getTime(),
       });
+      setTaskToUpdate(created);
     } catch (error) {
       // TODO handle error
       console.error(error);

@@ -1,11 +1,11 @@
-import Button from "@/components/Buttons/Button";
+import StatusField from "@/components/Fields/Status";
+import UsersField from "@/components/Fields/Users";
 import TextInput from "@/components/Inputs/Text";
 import Textarea from "@/components/Inputs/Textarea";
-import { Profile } from "@/components/Profile";
+import TaskLock from "@/components/Tasks/TaskLock";
 import { UserContext } from "@/contexts/User/UserContext";
 import { taskProvider } from "@/providers/firestore/task";
 import { UpdatePayload } from "@/providers/firestore/types";
-import { Lock } from "phosphor-react";
 import { ComponentProps, useContext, useEffect } from "react";
 import { useForm } from "react-hook-form";
 import { twMerge } from "tailwind-merge";
@@ -20,7 +20,6 @@ export default function UpdateTaskForm({ task, className, ...props }: Props) {
   const isOwner = user?.id === task.createdBy;
   const canEdit = isOwner || !task.locked;
   const displayLock = isOwner || task.locked;
-  const isCurrentAssignee = user?.id === task.assigneeId;
 
   const handleData = async (payload: UpdatePayload<ITask>) => {
     // TO DO handle error
@@ -60,16 +59,10 @@ export default function UpdateTaskForm({ task, className, ...props }: Props) {
           onBlur={({ target }) => handleData({ title: target.value })}
         />
         {displayLock && (
-          <Lock
-            className={twMerge(
-              "rounded p-2 transition-colors",
-              isOwner
-                ? "hover:bg-zinc-200 hover:text-black cursor-pointer"
-                : "cursor-not-allowed",
-              task.locked ? "text-primary" : "text-zinc-400"
-            )}
-            onClick={() => isOwner && handleData({ locked: !task.locked })}
-            size={48}
+          <TaskLock
+            isOwner={isOwner}
+            task={task}
+            onHandle={(locked) => handleData({ locked })}
           />
         )}
       </div>
@@ -82,37 +75,20 @@ export default function UpdateTaskForm({ task, className, ...props }: Props) {
         }
       />
       <div className="w-full flex justify-between items-center gap-4">
-        {task.assigneeId ? (
-          <Profile.Root
-            userId={task.assigneeId}
-            onClick={() =>
-              isCurrentAssignee && handlePublicData({ assigneeId: null })
-            }
-            className={
-              isCurrentAssignee
-                ? "hover:bg-zinc-200 rounded-lg transition-colors cursor-pointer"
-                : ""
-            }
-          >
-            <Profile.Avatar size="sm" />
-            <Profile.Content>
-              <Profile.Name
-                shortName
-                format={(name) =>
-                  isCurrentAssignee ? "Desatribuír-se" : `Atribuído a ${name}`
-                }
-                className={isCurrentAssignee ? "text-primary" : ""}
-              />
-            </Profile.Content>
-          </Profile.Root>
-        ) : (
-          <Button
-            onClick={() => handlePublicData({ assigneeId: user?.id })}
-            primary
-          >
-            Atribuír-se a tarefa
-          </Button>
-        )}
+        <UsersField
+          className="flex-1"
+          placement="top"
+          label="Atribuído"
+          selected={task.assigneeId}
+          onUserSelect={({ id }) => handlePublicData({ assigneeId: id })}
+        />
+        <StatusField
+          className="flex-1"
+          placement="top"
+          label="Status"
+          selected={task.status}
+          onStatusSelect={(status) => handlePublicData({ status })}
+        />
       </div>
     </form>
   );

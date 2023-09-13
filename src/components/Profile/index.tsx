@@ -2,6 +2,7 @@ import Avatar, { AvatarProps } from "@/components/Avatar";
 import { Text } from "@/components/Typography/Text";
 import { UserContext } from "@/contexts/User/UserContext";
 import { getShortName } from "@/utils/formats/string";
+import { DateTime } from "luxon";
 import {
   ComponentProps,
   ComponentPropsWithoutRef,
@@ -13,6 +14,7 @@ import { twMerge } from "tailwind-merge";
 
 interface IProfileContext {
   user: IUser;
+  isOnline: boolean;
 }
 
 const ProfileContext = createContext({} as IProfileContext);
@@ -25,7 +27,6 @@ const fallBackUser: IUser = {
   id: "",
   name: "Desconhecido",
   email: "",
-  isOnline: false,
   lastOnlineStatus: 0,
   createdAt: 0,
   photoURL: null,
@@ -39,11 +40,16 @@ function ProfileRoot({ userId, className, ...props }: ProfileRootProps) {
     [users, userId]
   );
 
+  const isOnline = useMemo(() => {
+    const now = new Date().getTime();
+    return now - user.lastOnlineStatus < 1000 * 60; // 1 minute
+  }, [user]);
+
   return (
-    <ProfileContext.Provider value={{ user }}>
+    <ProfileContext.Provider value={{ user, isOnline }}>
       <div
         className={twMerge(
-          "flex items-center gap-4 px-4 py-2 cursor-pointer",
+          "flex items-center gap-4 p-2 cursor-pointer",
           className
         )}
         {...props}
@@ -55,9 +61,9 @@ function ProfileRoot({ userId, className, ...props }: ProfileRootProps) {
 interface ProfileAvatarProps extends Omit<AvatarProps, "photoURL"> {}
 
 function ProfileAvatar(props: ProfileAvatarProps) {
-  const { user } = useContext(ProfileContext);
+  const { user, isOnline } = useContext(ProfileContext);
 
-  return <Avatar photoURL={user.photoURL} {...props} />;
+  return <Avatar isOnline={isOnline} photoURL={user.photoURL} {...props} />;
 }
 
 interface ProfileContentProps extends ComponentPropsWithoutRef<"span"> {}
@@ -69,7 +75,10 @@ function ProfileContent({
 }: ProfileContentProps) {
   return (
     <div
-      className={twMerge("flex flex-col items-start truncate", className)}
+      className={twMerge(
+        "flex flex-1 flex-col items-start truncate",
+        className
+      )}
       {...props}
     >
       {children}
@@ -94,7 +103,7 @@ function ProfileName({
   const formatted = format ? format(name) : name;
 
   return (
-    <Text className={twMerge(className)} truncate {...props}>
+    <Text className={twMerge("font-bold", className)} truncate {...props}>
       {formatted}
     </Text>
   );
@@ -115,10 +124,29 @@ function ProfileEmail({ format, className, ...props }: ProfileEmailProps) {
   );
 }
 
+interface ProfileStatusProps extends ComponentPropsWithoutRef<"span"> {
+  format?: (status: string) => string;
+}
+
+function ProfileStatus({ format, className, ...props }: ProfileStatusProps) {
+  const { user, isOnline } = useContext(ProfileContext);
+  const lastAccess = DateTime.fromMillis(user.lastOnlineStatus).toRelative();
+  const status = isOnline ? "online" : `online há ${lastAccess}`;
+
+  const formatted = format ? format(status) : status;
+
+  return (
+    <Text size="sm" className={twMerge(className)} truncate {...props}>
+      {formatted}
+    </Text>
+  );
+}
+
 export const Profile = {
   Root: ProfileRoot,
   Avatar: ProfileAvatar,
   Content: ProfileContent,
   Name: ProfileName,
   Email: ProfileEmail,
+  Status: ProfileStatus,
 };

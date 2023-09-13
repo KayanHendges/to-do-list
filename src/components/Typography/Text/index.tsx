@@ -3,7 +3,7 @@ import { ComponentProps, forwardRef } from "react";
 import { VariantProps, tv } from "tailwind-variants";
 
 const text = tv({
-  base: "font-sans text-zinc-900",
+  base: "font-sans font-normal text-zinc-900",
   variants: {
     size: {
       sm: "text-xs",

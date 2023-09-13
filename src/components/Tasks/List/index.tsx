@@ -51,8 +51,7 @@ export default function TaskList({
       </div>
       <div
         className={twMerge(
-          "flex-1 max-w-full w-full flex flex-col gap-2 overflow-y-auto",
-          ""
+          "flex-1 max-w-full w-full flex flex-col gap-2 overflow-y-auto"
         )}
       >
         {tasks.map((task) => (

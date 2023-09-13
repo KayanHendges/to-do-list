@@ -19,13 +19,13 @@ export default function Sidebar() {
       <Heading className="text-center" size="lg">
         Usuários
       </Heading>
-      <div className="w-full flex-1 max-h-full flex flex-col gap-2 overflow-y-auto">
+      <div className="w-full flex-1 max-h-full flex flex-col px-2 gap-2 overflow-y-auto">
         {list.map(({ id }) => (
           <Profile.Root key={id} userId={id}>
             <Profile.Avatar size="md" />
             <Profile.Content>
-              <Profile.Name shortName />
-              <Profile.Email />
+              <Profile.Name />
+              <Profile.Status />
             </Profile.Content>
           </Profile.Root>
         ))}

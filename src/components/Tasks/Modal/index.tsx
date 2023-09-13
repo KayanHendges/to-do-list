@@ -17,14 +17,16 @@ export default function TaskModal({ task, onClose, ...props }: Props) {
   const { doc: streamTask } = useDoc<ITask>("tasks", task.id);
   const [deleteAlert, setDeleteAlert] = useState<boolean>(false);
 
-  const created = DateTime.fromMillis(task.createdAt).toFormat(
-    "dd/MM/yyyy hh:mm"
-  );
+  const created = DateTime.fromMillis(task.createdAt).toRelative();
 
   return (
     <>
       {deleteAlert && (
-        <DeletetTaskModal className="z-30" task={task} onClose={() => setDeleteAlert(false)} />
+        <DeletetTaskModal
+          className="z-30"
+          task={task}
+          onClose={() => setDeleteAlert(false)}
+        />
       )}
       <Modal.Root size="md" onClose={() => onClose()} {...props}>
         <Modal.Header title="Editar Tarefa" />
