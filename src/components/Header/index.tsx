@@ -15,9 +15,10 @@ export default function Header() {
         <div className="flex items-center gap-2">
           <Profile.Root userId={user.id}>
             <Profile.Content>
-              <Profile.Name shortName className="text-white font-bold"/>
+              <Profile.Name shortName className="text-white font-bold" />
             </Profile.Content>
             <Profile.Avatar size="sm" className="border" />
+            <Profile.Card />
           </Profile.Root>
         </div>
       )}

@@ -12,7 +12,7 @@ import { twMerge } from "tailwind-merge";
 import { VariantProps, tv } from "tailwind-variants";
 
 const modalRootVariant = tv({
-  base: `max-w-full max-h-full flex flex-col rounded-2xl bg-zinc-50 overflow-hidden transition-all`,
+  base: `max-w-full max-h-full flex flex-col rounded-2xl bg-zinc-50 transition-all`,
   variants: {
     size: {
       auto: "w-auto h-auto",
@@ -73,9 +73,9 @@ const ModalRoot = ({
   return (
     <div
       className={twMerge(
-        "w-screen h-screen absolute top-0 left-0 z-20",
+        "w-screen h-screen fixed top-0 left-0 z-20",
         "flex flex-col items-center justify-center p-4",
-        "bg-zinc-900 transition-opacity overflow-hidden",
+        "bg-zinc-900 transition-opacity",
         isOpenState ? "bg-opacity-50 opacity-100" : "bg-opacity-0 opacity-0",
         className
       )}

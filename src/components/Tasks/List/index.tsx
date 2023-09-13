@@ -1,14 +1,12 @@
 import TaskCard from "@/components/Tasks/Card/intex";
 import { Heading } from "@/components/Typography/Heading";
-import useCollection from "@/hooks/firestore/useCollection";
-import { QueryConstraint, where } from "firebase/firestore";
-import { ComponentProps } from "react";
+import { TaskContext } from "@/contexts/Task";
+import { ComponentProps, useContext, useMemo } from "react";
 import { twMerge } from "tailwind-merge";
 
 interface Props extends ComponentProps<"div"> {
   status: TaskStatus;
   onTaskClick: (task: ITask) => void;
-  query: QueryConstraint[];
 }
 
 interface TaskConfig {
@@ -26,12 +24,14 @@ export default function TaskList({
   status,
   className,
   onTaskClick,
-  query,
   ...props
 }: Props) {
-  const { list: tasks } = useCollection<ITask>("tasks", {
-    query: [...query, where("status", "==", status)],
-  });
+  const { tasks } = useContext(TaskContext);
+  const list = useMemo(
+    () => tasks.filter((it) => it.status === status),
+    [status, tasks]
+  );
+
   const taskConfg = taskMapper[status];
 
   return (
@@ -52,7 +52,7 @@ export default function TaskList({
           "flex-1 max-w-full w-full flex flex-col gap-2 overflow-y-auto"
         )}
       >
-        {tasks.map((task) => (
+        {list.map((task) => (
           <TaskCard
             key={task.id}
             task={task}

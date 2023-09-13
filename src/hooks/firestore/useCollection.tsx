@@ -3,14 +3,10 @@ import { FirestoreEntity } from "@/providers/firestore/types";
 import { FirestoreError, QueryConstraint } from "firebase/firestore";
 import { useEffect, useState } from "react";
 
-interface ListOptions {
-  query: QueryConstraint[];
-}
-
 export default function useCollection<Entity extends FirestoreEntity>(
-  collection: string,
-  options?: ListOptions
+  collection: string
 ) {
+  const [query, setQuery] = useState<QueryConstraint[]>([]);
   const [list, setList] = useState<Entity[] | null>([]);
   const [error, setError] = useState<FirestoreError | null>(null);
 
@@ -19,12 +15,17 @@ export default function useCollection<Entity extends FirestoreEntity>(
     const unsubscribe = firestoreProvider.streamList({
       callback: setList,
       onError: setError,
-      fsQuery: options?.query,
+      fsQuery: query,
     });
 
     return () => unsubscribe();
-  // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [collection]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [collection, query]);
 
-  return { list: list || [], isLoading: list === null && !error, error };
+  return {
+    list: list || [],
+    isLoading: list === null && !error,
+    error,
+    setQuery,
+  };
 }

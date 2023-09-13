@@ -1,22 +1,22 @@
 import Button from "@/components/Buttons/Button";
 import Drawer from "@/components/Drawer";
 import UsersField from "@/components/Fields/Users";
+import TextInput from "@/components/Inputs/Text";
 import { Heading } from "@/components/Typography/Heading";
-import { QueryConstraint } from "firebase/firestore";
-import { ComponentProps } from "react";
+import { TaskContext } from "@/contexts/Task";
+import { ComponentProps, useContext } from "react";
 import { twMerge } from "tailwind-merge";
 
 interface Props extends ComponentProps<"div"> {
   onClose: () => void;
-  onFormChanges: (queries: QueryConstraint[]) => void;
 }
 
-export default function TaskFilters({
-  onClose,
-  className,
-  onFormChanges,
-  ...props
-}: Props) {
+export default function TaskFilters({ onClose, className, ...props }: Props) {
+  const { taskFilterForm } = useContext(TaskContext);
+  const { watch, setValue, register, reset } = taskFilterForm;
+
+  const filters = watch();
+
   return (
     <Drawer
       className={twMerge("flex flex-col", className)}
@@ -27,11 +27,21 @@ export default function TaskFilters({
         <Heading className="text-white text-center">Filtros</Heading>
       </div>
       <div className="flex-1 flex flex-col gap-2 p-4">
-        <UsersField label="Atribuído" />
-        <UsersField label="Criiado por" />
+        <TextInput label="Título" {...register("title")} />
+        <TextInput label="Descrição" {...register("description")} />
+        <UsersField
+          label="Atribuído"
+          selected={filters.assignee}
+          onUserSelect={(user) => setValue("assignee", user)}
+        />
+        <UsersField
+          label="Criiado por"
+          onUserSelect={(user) => setValue("createdBy", user)}
+          selected={filters.createdBy}
+        />
       </div>
       <div className="flex justify-between border-t-2 border-zinc-200 p-4">
-        <Button>Limpar Filtros</Button>
+        <Button onClick={() => reset()}>Limpar Filtros</Button>
         <Button primary onClick={() => onClose()}>
           Fechar
         </Button>

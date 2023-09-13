@@ -27,6 +27,7 @@ export default function Sidebar() {
               <Profile.Name />
               <Profile.Status />
             </Profile.Content>
+            <Profile.Card />
           </Profile.Root>
         ))}
       </div>

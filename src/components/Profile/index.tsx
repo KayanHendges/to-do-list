@@ -76,7 +76,7 @@ function ProfileRoot({
       <div
         className={twMerge(
           "flex items-center gap-4 p-2",
-          popUpCard && "cursor-pointer",
+          popUpCard && "relative cursor-pointer",
           className
         )}
         onClick={(e) => {
@@ -86,7 +86,6 @@ function ProfileRoot({
         {...props}
       >
         {children}
-        {displayCard && <ProfileCard />}
       </div>
     </ProfileContext.Provider>
   );
@@ -164,7 +163,7 @@ interface ProfileStatusProps extends ComponentPropsWithoutRef<"span"> {
 
 function ProfileStatus({ format, className, ...props }: ProfileStatusProps) {
   const { isOnline, lastAccess } = useContext(ProfileContext);
-  const status = isOnline ? "online" : `online há ${lastAccess}`;
+  const status = isOnline ? "online" : `online ${lastAccess}`;
 
   const formatted = format ? format(status) : status;
 
@@ -180,7 +179,7 @@ interface ProfileCardProps extends ComponentPropsWithoutRef<"span"> {}
 function ProfileCard({ className, ...props }: ProfileCardProps) {
   const { user: loggedUser, logOut } = useContext(UserContext);
 
-  const { user, setDisplayCard, isOnline, lastAccess } =
+  const { user, displayCard, setDisplayCard, isOnline, lastAccess } =
     useContext(ProfileContext);
   const status = isOnline ? "online" : `online há ${lastAccess}`;
 
@@ -192,12 +191,13 @@ function ProfileCard({ className, ...props }: ProfileCardProps) {
 
   const isLoggedUser = user.id === loggedUser?.id;
 
+  if (!displayCard) return <></>;
+
   return (
-    <Modal.Root size="sm" onClose={() => setDisplayCard(false)}>
+    <Modal.Root className={className} size="sm" onClose={() => setDisplayCard(false)}>
       <Modal.Body
         className={twMerge(
           "flex flex-col justify-center items-center gap-4",
-          className
         )}
         {...props}
       >
@@ -228,4 +228,5 @@ export const Profile = {
   Name: ProfileName,
   Email: ProfileEmail,
   Status: ProfileStatus,
+  Card: ProfileCard,
 };

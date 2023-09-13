@@ -19,12 +19,14 @@ interface Props extends ComponentProps<"div">, UserProps {
 
 interface UserItemProps extends ComponentProps<"div"> {
   user: IUser;
+  selected?: boolean;
   hoverEffect?: boolean;
 }
 
 const UserItem = ({
   user,
   hoverEffect = false,
+  selected = false,
   className,
   ...props
 }: UserItemProps) => {
@@ -37,7 +39,12 @@ const UserItem = ({
     >
       <Profile.Avatar size="sm" />
       <Profile.Content>
-        <Profile.Name className={hoverEffect ? "group-hover:text-white" : ""} />
+        <Profile.Name
+          className={twMerge(
+            hoverEffect && "group-hover:text-white",
+            selected && "text-white"
+          )}
+        />
       </Profile.Content>
     </Profile.Root>
   );
@@ -83,15 +90,19 @@ export default function UsersField({
         {selectedUser && <UserItem user={selectedUser} />}
       </SingleSelect.Input>
       <SingleSelect.Menu placement={placement}>
-        {list.map((user) => (
-          <SingleSelect.Item
-            key={user.id}
-            className="group"
-            onClick={() => handleOnSelect(user)}
-          >
-            <UserItem user={user} hoverEffect />
-          </SingleSelect.Item>
-        ))}
+        {list.map((user) => {
+          const isSelected = user.id === selectedUser?.id;
+          return (
+            <SingleSelect.Item
+              key={user.id}
+              className="group"
+              selected={isSelected}
+              onClick={() => handleOnSelect(user)}
+            >
+              <UserItem user={user} hoverEffect selected={isSelected} />
+            </SingleSelect.Item>
+          );
+        })}
       </SingleSelect.Menu>
     </SingleSelect.Root>
   );
