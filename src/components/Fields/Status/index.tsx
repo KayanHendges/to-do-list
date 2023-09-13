@@ -1,5 +1,6 @@
 import SingleSelect, {
   SelectPlacement,
+  SingleSelectRootProps,
 } from "@/components/Selects/SingleSelect";
 import { ComponentProps } from "react";
 import { twMerge } from "tailwind-merge";
@@ -13,7 +14,10 @@ interface StatusProps {
   onStatusSelect?: (status: TaskStatus) => void;
 }
 
-interface Props extends ComponentProps<"div">, StatusProps {
+interface Props
+  extends ComponentProps<"div">,
+    StatusProps,
+    SingleSelectRootProps {
   placement?: SelectPlacement;
   selected?: TaskStatus;
   label?: string;

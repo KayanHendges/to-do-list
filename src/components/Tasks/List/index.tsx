@@ -52,7 +52,7 @@ export default function TaskList({
           "w-full flex-1 relative flex overflow-y-auto"
         )}
       >
-        <div className="flex absolute flex-col gap-4 py-4">
+        <div className=" w-full flex absolute flex-col gap-4 py-4">
           {list.map((task) => (
             <TaskCard
               key={task.id}

@@ -17,21 +17,27 @@ import { twMerge } from "tailwind-merge";
 interface ISingleSelectContext {
   isModalOpen: boolean;
   setIsModalOpen: (value: boolean) => void;
+  disabled?: boolean;
 }
 
 const SingleSelectContext = createContext({} as ISingleSelectContext);
 
-interface SingleSelectRootProps extends ComponentProps<"div"> {}
+export interface SingleSelectRootProps extends ComponentProps<"div"> {
+  disabled?: boolean;
+}
 
 function SingleSelectRoot({
   className,
   children,
+  disabled,
   ...props
 }: SingleSelectRootProps) {
   const [isModalOpen, setIsModalOpen] = useState<boolean>(false);
 
   return (
-    <SingleSelectContext.Provider value={{ isModalOpen, setIsModalOpen }}>
+    <SingleSelectContext.Provider
+      value={{ isModalOpen, setIsModalOpen, disabled }}
+    >
       <div
         className={twMerge("w-full flex flex-col relative", className)}
         {...props}
@@ -61,7 +67,8 @@ function SingleSelectInput({
   ...props
 }: SingleSelectInputProps) {
   const [input, setInput] = useState<string>("");
-  const { isModalOpen, setIsModalOpen } = useContext(SingleSelectContext);
+  const { isModalOpen, setIsModalOpen, disabled } =
+    useContext(SingleSelectContext);
   const hasElementChildren =
     children && typeof children !== "string" && !isModalOpen;
 
@@ -74,6 +81,7 @@ function SingleSelectInput({
   const handleOnClick = (
     event: MouseEvent<HTMLInputElement, globalThis.MouseEvent>
   ) => {
+    if (disabled) return;
     setIsModalOpen(true);
     props.onClick && props.onClick(event);
   };
@@ -90,7 +98,14 @@ function SingleSelectInput({
       onClick={handleOnClick}
     >
       {hasElementChildren ? (
-        <span onClick={handleOnClick} className="flex-1 truncate">
+        <span
+          onClick={handleOnClick}
+          className={twMerge(
+            "flex-1 truncate",
+            !isModalOpen && "cursor-pointer",
+            disabled && "cursor-not-allowed"
+          )}
+        >
           {children}
         </span>
       ) : (
@@ -98,9 +113,11 @@ function SingleSelectInput({
           type="text"
           className={twMerge(
             "flex-1 outline-none bg-transparent p-2",
-            !isModalOpen && "cursor-pointer"
+            !isModalOpen && "cursor-pointer",
+            disabled && "cursor-not-allowed"
           )}
           {...props}
+          disabled={props.disabled || disabled}
           onChange={handleOnChange}
           onClick={handleOnClick}
           value={
@@ -129,7 +146,8 @@ function SingleSelectMenu({
   ...props
 }: SingleSelectMenuProps) {
   const menuRef = useRef<HTMLDivElement>(null);
-  const { isModalOpen, setIsModalOpen } = useContext(SingleSelectContext);
+  const { isModalOpen, setIsModalOpen, disabled } =
+    useContext(SingleSelectContext);
 
   useComponentClick({
     ref: menuRef,
@@ -138,7 +156,7 @@ function SingleSelectMenu({
     },
   });
 
-  if (!isModalOpen) return <></>;
+  if (!isModalOpen || disabled) return <></>;
 
   return (
     <div

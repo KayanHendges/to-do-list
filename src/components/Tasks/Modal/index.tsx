@@ -4,9 +4,10 @@ import { Modal } from "@/components/Modal";
 import { Profile } from "@/components/Profile";
 import DeletetTaskModal from "@/components/Tasks/DeleteTaskModal";
 import { Text } from "@/components/Typography/Text";
+import { UserContext } from "@/contexts/User/UserContext";
 import useDoc from "@/hooks/firestore/useDoc";
 import { DateTime } from "luxon";
-import { ComponentProps, useState } from "react";
+import { ComponentProps, useContext, useState } from "react";
 
 interface Props extends ComponentProps<"div"> {
   task: ITask;
@@ -15,7 +16,11 @@ interface Props extends ComponentProps<"div"> {
 
 export default function TaskModal({ task, onClose, ...props }: Props) {
   const { doc: streamTask } = useDoc<ITask>("tasks", task.id);
+  const { user } = useContext(UserContext);
   const [deleteAlert, setDeleteAlert] = useState<boolean>(false);
+
+  const isOwner = user?.id === task.createdBy;
+  const displayDeleteButton = isOwner || !streamTask?.locked;
 
   const created = DateTime.fromMillis(task.createdAt).toRelative();
 
@@ -47,7 +52,9 @@ export default function TaskModal({ task, onClose, ...props }: Props) {
             <Text>{created}</Text>
           </div>
           <div className="flex items-center gap-2">
-            <Button onClick={() => setDeleteAlert(true)}>Excluir</Button>
+            {displayDeleteButton && (
+              <Button onClick={() => setDeleteAlert(true)}>Excluir</Button>
+            )}
             <Button onClick={() => onClose()} primary>
               Fechar
             </Button>

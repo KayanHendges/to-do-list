@@ -1,6 +1,7 @@
 import { Profile } from "@/components/Profile";
 import SingleSelect, {
   SelectPlacement,
+  SingleSelectRootProps,
 } from "@/components/Selects/SingleSelect";
 import { UserContext } from "@/contexts/User/UserContext";
 import { ComponentProps, useContext, useMemo, useState } from "react";
@@ -10,7 +11,10 @@ interface UserProps {
   onUserSelect?: (user: IUser | null) => void;
 }
 
-interface Props extends ComponentProps<"div">, UserProps {
+interface Props
+  extends ComponentProps<"div">,
+    SingleSelectRootProps,
+    UserProps {
   placement?: SelectPlacement;
   selected?: IUser | string | null;
   notAllowNull?: boolean;

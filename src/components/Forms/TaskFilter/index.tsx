@@ -35,7 +35,7 @@ export default function TaskFilters({ onClose, className, ...props }: Props) {
           onUserSelect={(user) => setValue("assignee", user)}
         />
         <UsersField
-          label="Criiado por"
+          label="Criado por"
           onUserSelect={(user) => setValue("createdBy", user)}
           selected={filters.createdBy}
         />

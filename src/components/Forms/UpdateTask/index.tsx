@@ -18,17 +18,23 @@ export default function UpdateTaskForm({ task, className, ...props }: Props) {
   const { user } = useContext(UserContext);
 
   const isOwner = user?.id === task.createdBy;
-  const canEdit = isOwner || !task.locked;
+  const isAssignee = user?.id === task.assigneeId;
+
   const displayLock = isOwner || task.locked;
 
-  const handleData = async (payload: UpdatePayload<ITask>) => {
+  const writePermission = task.locked ? isOwner : true;
+
+  const assigneePermission = task.assigneeId ? isOwner || isAssignee : true;
+
+  const statusPermission = task.assigneeId ? isOwner || isAssignee : true;
+
+  const handleData = async (
+    payload: UpdatePayload<ITask>,
+    needsPermissiion = true
+  ) => {
     // TO DO handle error
-    if (task.locked && !isOwner) return;
+    if (task.locked && !isOwner && needsPermissiion) return;
 
-    await taskProvider.update(payload, task.id);
-  };
-
-  const handlePublicData = async (payload: UpdatePayload<ITask>) => {
     await taskProvider.update(payload, task.id);
   };
 
@@ -54,7 +60,7 @@ export default function UpdateTaskForm({ task, className, ...props }: Props) {
     >
       <div className="w-full flex justify-between items-center gap-4">
         <TextInput
-          disabled={!canEdit}
+          disabled={!writePermission}
           {...form.register("title")}
           onBlur={({ target }) => handleData({ title: target.value })}
         />
@@ -68,7 +74,7 @@ export default function UpdateTaskForm({ task, className, ...props }: Props) {
       </div>
       <Textarea
         className="flex-1"
-        disabled={!canEdit}
+        disabled={!writePermission}
         {...form.register("description")}
         onBlur={({ target }) =>
           handleData({ description: target.value || null })
@@ -80,8 +86,9 @@ export default function UpdateTaskForm({ task, className, ...props }: Props) {
           placement="top"
           label="Atribuído"
           selected={task.assigneeId}
+          disabled={!assigneePermission}
           onUserSelect={(user) =>
-            handlePublicData({ assigneeId: user?.id || null })
+            handleData({ assigneeId: user?.id || null }, false)
           }
         />
         <StatusField
@@ -89,7 +96,8 @@ export default function UpdateTaskForm({ task, className, ...props }: Props) {
           placement="top"
           label="Status"
           selected={task.status}
-          onStatusSelect={(status) => handlePublicData({ status })}
+          disabled={!statusPermission}
+          onStatusSelect={(status) => handleData({ status }, false)}
         />
       </div>
     </form>
