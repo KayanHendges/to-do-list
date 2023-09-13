@@ -60,16 +60,14 @@ export default function UserProvider({ children }: { children: ReactNode }) {
     }
   };
 
+  const logOut = async () => {
+    return auth.signOut();
+  };
+
   useEffect(() => {
     auth.onAuthStateChanged(onAuthStateChanged);
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
-
-  useEffect(() => {
-    if (!user) return;
-
-    fbUserProvider.handlePresence(user.id);
-  }, [user]);
 
   useEffect(() => {
     if (!user) return;
@@ -86,7 +84,9 @@ export default function UserProvider({ children }: { children: ReactNode }) {
   }, [user]);
 
   return (
-    <UserContext.Provider value={{ user, setUser, users, validateGoogleUser }}>
+    <UserContext.Provider
+      value={{ user, setUser, users, validateGoogleUser, logOut }}
+    >
       {children}
     </UserContext.Provider>
   );

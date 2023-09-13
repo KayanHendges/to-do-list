@@ -3,6 +3,7 @@
 import { Text } from "@/components/Typography/Text";
 import { useComponentClick } from "@/hooks/dom";
 import {
+  ChangeEvent,
   ComponentProps,
   ComponentPropsWithoutRef,
   MouseEvent,
@@ -49,17 +50,26 @@ function SingleSelectLabel({ className, ...props }: SingleSelectLabelProps) {
 
 interface SingleSelectInputProps extends ComponentPropsWithoutRef<"input"> {
   hasTextInput?: boolean;
+  onInputChanges?: (input: string) => void;
 }
 
 function SingleSelectInput({
   className,
   children,
   hasTextInput = true,
+  onInputChanges,
   ...props
 }: SingleSelectInputProps) {
   const [input, setInput] = useState<string>("");
   const { isModalOpen, setIsModalOpen } = useContext(SingleSelectContext);
-  const hasElementChildren = children && typeof children !== "string";
+  const hasElementChildren =
+    children && typeof children !== "string" && !isModalOpen;
+
+  const handleOnChange = (event: ChangeEvent<HTMLInputElement>) => {
+    props.onChange && props.onChange(event);
+    onInputChanges && onInputChanges(event.target.value);
+    setInput(event.target.value);
+  };
 
   const handleOnClick = (
     event: MouseEvent<HTMLInputElement, globalThis.MouseEvent>
@@ -91,10 +101,7 @@ function SingleSelectInput({
             !isModalOpen && "cursor-pointer"
           )}
           {...props}
-          onChange={(e) => {
-            setInput(e.target.value);
-            props.onChange && props.onChange(e);
-          }}
+          onChange={handleOnChange}
           onClick={handleOnClick}
           value={
             isModalOpen && hasTextInput
@@ -139,7 +146,7 @@ function SingleSelectMenu({
       data-placement-top={placement === "top" || undefined}
       data-placement-bottom={placement === "bottom" || undefined}
       className={twMerge(
-        "w-full absolute overflow-y-auto",
+        "w-full max-w-sm absolute overflow-y-auto",
         "bg-zinc-50 border-2 border-primary rounded-lg",
         "data-[placement-top]:bottom-full data-[placement-bottom]:top-full",
         className
@@ -161,8 +168,11 @@ function SingleSelectItem({
   selected,
   className,
   children,
+  onClick,
   ...props
 }: SingleSelectItemProps) {
+  const { setIsModalOpen } = useContext(SingleSelectContext);
+
   return (
     <Text
       size="lg"
@@ -172,6 +182,10 @@ function SingleSelectItem({
         hoverEffect && "hover:bg-primary hover:text-white",
         className
       )}
+      onClick={(e) => {
+        onClick && onClick(e);
+        setIsModalOpen(false);
+      }}
       {...props}
     >
       {children}

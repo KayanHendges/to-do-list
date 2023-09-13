@@ -80,7 +80,9 @@ export default function UpdateTaskForm({ task, className, ...props }: Props) {
           placement="top"
           label="Atribuído"
           selected={task.assigneeId}
-          onUserSelect={({ id }) => handlePublicData({ assigneeId: id })}
+          onUserSelect={(user) =>
+            handlePublicData({ assigneeId: user?.id || null })
+          }
         />
         <StatusField
           className="flex-1"

@@ -6,4 +6,5 @@ interface IUserContext {
   users: IUser[];
   setUser: Dispatch<SetStateAction<IUser | null>>;
   validateGoogleUser: (user: GoogleUser) => Promise<IUser>;
+  logOut: () => void;
 }

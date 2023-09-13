@@ -1,4 +1,7 @@
 import Avatar, { AvatarProps } from "@/components/Avatar";
+import Button from "@/components/Buttons/Button";
+import { Modal } from "@/components/Modal";
+import { Heading } from "@/components/Typography/Heading";
 import { Text } from "@/components/Typography/Text";
 import { UserContext } from "@/contexts/User/UserContext";
 import { getShortName } from "@/utils/formats/string";
@@ -9,18 +12,23 @@ import {
   createContext,
   useContext,
   useMemo,
+  useState,
 } from "react";
 import { twMerge } from "tailwind-merge";
 
 interface IProfileContext {
   user: IUser;
   isOnline: boolean;
+  displayCard: boolean;
+  setDisplayCard: (display: boolean) => void;
+  lastAccess: string | null;
 }
 
 const ProfileContext = createContext({} as IProfileContext);
 
 interface ProfileRootProps extends ComponentProps<"div"> {
   userId: string;
+  popUpCard?: boolean;
 }
 
 const fallBackUser: IUser = {
@@ -32,7 +40,15 @@ const fallBackUser: IUser = {
   photoURL: null,
 };
 
-function ProfileRoot({ userId, className, ...props }: ProfileRootProps) {
+function ProfileRoot({
+  userId,
+  popUpCard = true,
+  className,
+  children,
+  onClick,
+  ...props
+}: ProfileRootProps) {
+  const [displayCard, setDisplayCard] = useState<boolean>(false);
   const { users } = useContext(UserContext);
 
   const user = useMemo(
@@ -42,18 +58,36 @@ function ProfileRoot({ userId, className, ...props }: ProfileRootProps) {
 
   const isOnline = useMemo(() => {
     const now = new Date().getTime();
-    return now - user.lastOnlineStatus < 1000 * 60; // 1 minute
+    return now - user.lastOnlineStatus < 1000 * 60 * 2; // 2 minutes
   }, [user]);
 
+  const lastAccess = DateTime.fromMillis(user.lastOnlineStatus).toRelative();
+
   return (
-    <ProfileContext.Provider value={{ user, isOnline }}>
+    <ProfileContext.Provider
+      value={{
+        user,
+        isOnline,
+        displayCard,
+        setDisplayCard,
+        lastAccess,
+      }}
+    >
       <div
         className={twMerge(
-          "flex items-center gap-4 p-2 cursor-pointer",
+          "flex items-center gap-4 p-2",
+          popUpCard && "cursor-pointer",
           className
         )}
+        onClick={(e) => {
+          onClick && onClick(e);
+          popUpCard && setDisplayCard(true);
+        }}
         {...props}
-      ></div>
+      >
+        {children}
+        {displayCard && <ProfileCard />}
+      </div>
     </ProfileContext.Provider>
   );
 }
@@ -129,8 +163,7 @@ interface ProfileStatusProps extends ComponentPropsWithoutRef<"span"> {
 }
 
 function ProfileStatus({ format, className, ...props }: ProfileStatusProps) {
-  const { user, isOnline } = useContext(ProfileContext);
-  const lastAccess = DateTime.fromMillis(user.lastOnlineStatus).toRelative();
+  const { isOnline, lastAccess } = useContext(ProfileContext);
   const status = isOnline ? "online" : `online há ${lastAccess}`;
 
   const formatted = format ? format(status) : status;
@@ -139,6 +172,52 @@ function ProfileStatus({ format, className, ...props }: ProfileStatusProps) {
     <Text size="sm" className={twMerge(className)} truncate {...props}>
       {formatted}
     </Text>
+  );
+}
+
+interface ProfileCardProps extends ComponentPropsWithoutRef<"span"> {}
+
+function ProfileCard({ className, ...props }: ProfileCardProps) {
+  const { user: loggedUser, logOut } = useContext(UserContext);
+
+  const { user, setDisplayCard, isOnline, lastAccess } =
+    useContext(ProfileContext);
+  const status = isOnline ? "online" : `online há ${lastAccess}`;
+
+  const { name, email, photoURL, createdAt } = user;
+  const joined = DateTime.fromMillis(createdAt).toFormat(
+    "dd/MM/yyyy HH:mm",
+    {}
+  );
+
+  const isLoggedUser = user.id === loggedUser?.id;
+
+  return (
+    <Modal.Root size="sm" onClose={() => setDisplayCard(false)}>
+      <Modal.Body
+        className={twMerge(
+          "flex flex-col justify-center items-center gap-4",
+          className
+        )}
+        {...props}
+      >
+        <Avatar size="xl" photoURL={photoURL} isOnline={isOnline} />
+        <div className="flex flex-col text-center">
+          <Heading>{name}</Heading>
+          {email && <Text size="xl">{email}</Text>}
+        </div>
+        <Text>{status}</Text>
+      </Modal.Body>
+      <Modal.Footer>
+        <Text>Entrou em {joined}</Text>
+        <div className="flex gap-2">
+          {isLoggedUser && (
+            <Button onClick={() => logOut()}>Sair da conta</Button>
+          )}
+          <Button primary>Fechar</Button>
+        </div>
+      </Modal.Footer>
+    </Modal.Root>
   );
 }
 

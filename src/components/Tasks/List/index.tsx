@@ -2,7 +2,7 @@ import TaskCard from "@/components/Tasks/Card/intex";
 import { Heading } from "@/components/Typography/Heading";
 import useCollection from "@/hooks/firestore/useCollection";
 import { where } from "firebase/firestore";
-import { ComponentProps } from "react";
+import { ComponentProps, useEffect } from "react";
 import { twMerge } from "tailwind-merge";
 
 interface Props extends ComponentProps<"div"> {
@@ -31,20 +31,16 @@ export default function TaskList({
     query: [where("status", "==", status)],
   });
   const taskConfg = taskMapper[status];
-
+  
   return (
     <div
-      className={twMerge(
-        "flex-1 max-w-full h-full flex flex-col gap-2",
-        className
-      )}
+      className={twMerge("flex-1 flex flex-col gap-2", className)}
       {...props}
     >
       <div
         className={twMerge(
           "w-full flex justify-center px-4 py-2 truncate rounded",
-          taskConfg.className,
-          className
+          taskConfg.className
         )}
       >
         <Heading className="text-white">{taskConfg.title}</Heading>

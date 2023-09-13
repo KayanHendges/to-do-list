@@ -1,9 +1,6 @@
 import { FireStoreProvider } from "@/providers/firestore";
 import { FirestoreEntity } from "@/providers/firestore/types";
-import {
-  FirestoreError,
-  QueryConstraint,
-} from "firebase/firestore";
+import { FirestoreError, QueryConstraint } from "firebase/firestore";
 import { useEffect, useState } from "react";
 
 interface ListOptions {
@@ -26,7 +23,8 @@ export default function useCollection<Entity extends FirestoreEntity>(
     });
 
     return () => unsubscribe();
-  }, [collection, options?.query]);
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [collection]);
 
   return { list: list || [], isLoading: list === null && !error, error };
 }

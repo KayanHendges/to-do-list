@@ -7,7 +7,8 @@ const avatar = tv({
     size: {
       sm: "w-8 h-8  border",
       md: "w-12 h-12 border-2",
-      lg: "w-20 h-20 border-4",
+      lg: "w-24 h-24 border-4",
+      xl: "w-32 h-32 border-4",
     },
     isOnline: { true: "border-green-500" },
   },
