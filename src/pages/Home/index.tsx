@@ -1,13 +1,18 @@
 import Button from "@/components/Buttons/Button";
+import TaskFilter from "@/components/Forms/TaskFilter";
 import TaskList from "@/components/Tasks/List";
 import TaskModal from "@/components/Tasks/Modal";
 import { Heading } from "@/components/Typography/Heading";
 import { UserContext } from "@/contexts/User/UserContext";
 import { taskProvider } from "@/providers/firestore/task";
+import { QueryConstraint } from "firebase/firestore";
 import { useContext, useState } from "react";
 import { twMerge } from "tailwind-merge";
 
 export default function HomePage() {
+  const [isFiltersOpen, setIsFiltersOpen] = useState<boolean>(false);
+  const [taskQuery, setTaskQuery] = useState<QueryConstraint[]>([]);
+
   const [isCreating, setIsCreating] = useState<boolean>(false);
   const [taskToUpdate, setTaskToUpdate] = useState<ITask | null>(null);
   const { user } = useContext(UserContext);
@@ -44,7 +49,7 @@ export default function HomePage() {
         <Heading size="xl" className="mr-auto ml-4">
           Tarefas
         </Heading>
-        <Button>Filtros</Button>
+        <Button onClick={() => setIsFiltersOpen(true)}>Filtros</Button>
         <Button primary onClick={() => createTask()} isLoading={isCreating}>
           Criar
         </Button>
@@ -55,10 +60,28 @@ export default function HomePage() {
           "p-8 pb-0 bg-white rounded-lg"
         )}
       >
-        <TaskList onTaskClick={setTaskToUpdate} status="open" />
-        <TaskList onTaskClick={setTaskToUpdate} status="inProgress" />
-        <TaskList onTaskClick={setTaskToUpdate} status="done" />
+        <TaskList
+          query={taskQuery}
+          onTaskClick={setTaskToUpdate}
+          status="open"
+        />
+        <TaskList
+          query={taskQuery}
+          onTaskClick={setTaskToUpdate}
+          status="inProgress"
+        />
+        <TaskList
+          query={taskQuery}
+          onTaskClick={setTaskToUpdate}
+          status="done"
+        />
       </div>
+      {isFiltersOpen && (
+        <TaskFilter
+          onFormChanges={() => setTaskQuery([])}
+          onClose={() => setIsFiltersOpen(false)}
+        />
+      )}
     </div>
   );
 }
