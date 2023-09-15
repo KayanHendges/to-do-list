@@ -12,7 +12,7 @@ import { twMerge } from "tailwind-merge";
 import { VariantProps, tv } from "tailwind-variants";
 
 const modalRootVariant = tv({
-  base: `max-w-full max-h-full flex flex-col rounded-2xl bg-zinc-50 transition-all`,
+  base: `max-w-full max-h-full flex flex-col rounded-2xl bg-zinc-50 transition-all overflow-hidden`,
   variants: {
     size: {
       auto: "w-auto h-auto",

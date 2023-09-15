@@ -11,4 +11,6 @@ interface ITaskFilter {
 interface ITaskContext {
   tasks: ITask[];
   taskFilterForm: UseFormReturn<ITaskFilter>;
+  isFiltersOpen: boolean;
+  setIsFiltersOpen: (isOpen: boolean) => void;
 }

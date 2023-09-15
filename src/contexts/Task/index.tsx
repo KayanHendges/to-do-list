@@ -1,12 +1,14 @@
 import { ITaskContext, ITaskFilter } from "@/contexts/Task/types";
 import useCollection from "@/hooks/firestore/useCollection";
 import { QueryConstraint, where } from "firebase/firestore";
-import { ReactNode, createContext, useEffect, useMemo } from "react";
+import { ReactNode, createContext, useEffect, useMemo, useState } from "react";
 import { useForm } from "react-hook-form";
 
 export const TaskContext = createContext({} as ITaskContext);
 
 export default function TaskProvider({ children }: { children: ReactNode }) {
+  const [isFiltersOpen, setIsFiltersOpen] = useState<boolean>(false);
+
   const taskFilterForm = useForm<ITaskFilter>({
     defaultValues: {
       title: "",
@@ -54,7 +56,9 @@ export default function TaskProvider({ children }: { children: ReactNode }) {
   );
 
   return (
-    <TaskContext.Provider value={{ tasks, taskFilterForm }}>
+    <TaskContext.Provider
+      value={{ tasks, taskFilterForm, isFiltersOpen, setIsFiltersOpen }}
+    >
       {children}
     </TaskContext.Provider>
   );

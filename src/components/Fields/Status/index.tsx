@@ -32,12 +32,14 @@ const statusMapper: Record<TaskStatus, IStatusConfig> = {
 interface StatusItemProps extends StatusProps {
   status: TaskStatus;
   hoverEffect?: boolean;
+  selected?: boolean;
 }
 
 const StatusItem = ({
   status,
   onStatusSelect,
   hoverEffect = true,
+  selected,
 }: StatusItemProps) => {
   const { borderColor, label } = statusMapper[status];
 
@@ -46,6 +48,7 @@ const StatusItem = ({
       key={status}
       onClick={() => onStatusSelect && onStatusSelect(status)}
       hoverEffect={hoverEffect}
+      selected={selected}
     >
       <span className={twMerge("pl-2 border-l-2 ", borderColor)}>{label}</span>
     </SingleSelect.Item>
@@ -66,15 +69,14 @@ export default function StatusField({
         {selected && <StatusItem status={selected} hoverEffect={false} />}
       </SingleSelect.Input>
       <SingleSelect.Menu placement={placement}>
-        {Object.keys(statusMapper)
-          .filter((key) => key !== selected)
-          .map((key) => (
-            <StatusItem
-              key={key}
-              status={key as TaskStatus}
-              onStatusSelect={onStatusSelect}
-            />
-          ))}
+        {Object.keys(statusMapper).map((key) => (
+          <StatusItem
+            key={key}
+            status={key as TaskStatus}
+            selected={key === selected}
+            onStatusSelect={onStatusSelect}
+          />
+        ))}
       </SingleSelect.Menu>
     </SingleSelect.Root>
   );
